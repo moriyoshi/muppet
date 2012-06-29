@@ -1,0 +1,2 @@
+class MuppetApplicationError(Exception):
+    pass
