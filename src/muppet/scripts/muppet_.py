@@ -19,7 +19,8 @@ def initialize_logger(verbose, progname):
         level=verbose and logging.INFO or logging.WARNING,
         format="%s: %%(message)s" % progname
         )
-    logging.captureWarnings(True)
+    if hasattr(logging, 'captureWarnings'):
+        logging.captureWarnings(True)
 
 def dynamic_defaults():
     return {
