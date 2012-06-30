@@ -83,7 +83,7 @@ class put(ProjectCommand):
                 self.settings['muppet.cache_dir'],
                 datetime.now().strftime(self.settings['muppet.timestamp'])
                 )
-            fabric.contrib.project.rsync_project(local_dir=server_settings_dir + '/', remote_dir=remote_dir)
+            fabric.contrib.project.rsync_project(local_dir=server_settings_dir + '/', remote_dir=remote_dir, extra_opts='-L')
             options = []
             if self.variables.get('verbose'):
                 options.append('-v')

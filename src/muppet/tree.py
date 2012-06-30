@@ -110,8 +110,10 @@ class Symlink(Entry):
 
     def merge(self, that):
         retval = Entry.merge(self, that)
-        if isinstance(that, Symlink):
-            retval.to = retval.to or that.to
+        if isinstance(retval, Symlink):
+            retval.to = self.to
+            if isinstance(that, Symlink):
+                retval.to = that.to
         return retval
 
 class Directory(Entry):
@@ -171,13 +173,10 @@ class Directory(Entry):
             stat = os.lstat(abs_path)
             if stat.st_mode & S_IFDIR:
                 entry = Directory(tree, retval, entry_name, EntryMetadata())
-            elif stat.st_mode & S_IFLNK == S_IFLNK:
-                entry = Symlink(tree, retval, entry_name, EntryMetadata(), to=os.readlink(abs_path))
+            elif entry_prototype is None:
+                entry = File(tree, retval, entry_name, EntryMetadata())
             else:
-                if entry_prototype is None and stat.st_mode & S_IFREG == S_IFREG:
-                    entry = File(tree, retval, entry_name, EntryMetadata())
-                else:
-                    entry = Entry(tree, retval, entry_name, EntryMetadata())
+                entry = Entry(tree, retval, entry_name, EntryMetadata())
 
             if entry_prototype is not None:
                 entry = entry_prototype.merge(entry)
