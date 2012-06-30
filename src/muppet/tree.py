@@ -200,7 +200,7 @@ def set_mode_and_owner(entry_path, entry):
     if entry.group is not None:
         os.chgrp(entry_path, entry.group)
 
-class TreeCopyier(object):
+class TreeCopier(object):
     def __init__(self, dry_run=False):
         self.dry_run = dry_run
         self.unmanaged_files = []
@@ -278,7 +278,7 @@ class TreeCopyier(object):
         self._copy(dest, src, tree.root)
 
 def copy(dest, src, tree, dry_run=False):
-    copier = TreeCopyier(dry_run)
+    copier = TreeCopier(dry_run)
     copier(dest, src, tree)
     if copier.unmanaged_files:
         logging.warning("The following files are unmanaged:")
