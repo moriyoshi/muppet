@@ -3,6 +3,7 @@ import os
 import logging
 from stat import *
 from muppet.exceptions import MuppetException, MuppetPrerequisiteError
+from muppet.utils import getuidfor, getgidfor
 import shutil
 
 MUPPET_META = '.muppetmeta'
@@ -191,13 +192,13 @@ class Directory(Entry):
  
         return retval
 
-def set_mode_and_owner(entry_path, entry):
+def set_mode_and_owner(entry_path, stat, entry):
     if entry.mode is not None:
-        os.chmod(entry_path, entry.mode)
-    if entry.owner is not None:
-        os.chown(entry_path, entry.owner)
-    if entry.group is not None:
-        os.chgrp(entry_path, entry.group)
+        os.lchmod(entry_path, entry.mode)
+    if entry.owner is not None or entry.group is not None:
+        owner = getuidfor(entry.owner) or stat.st_uid
+        group = getgidfor(entry.group) or stat.st_gid
+        os.lchown(entry_path, owner, group)
 
 class TreeCopier(object):
     def __init__(self, dry_run=False):
@@ -245,7 +246,7 @@ class TreeCopier(object):
                     if not self.dry_run:
                         if stat is None:
                             os.mkdir(dest_path)
-                        set_mode_and_owner(dest_path, dir)
+                        set_mode_and_owner(dest_path, stat, dir)
                     self._copy(dest_path, src_path, entry)
                     self.check_unmanaged(dest_path, entry.entries)
                 elif isinstance(entry, Symlink):
@@ -259,7 +260,7 @@ class TreeCopier(object):
                     logging.info("Creating %s" % dest_path)
                     if not self.dry_run:
                         os.symlink(entry.to, dest_path)
-                        set_mode_and_owner(dest_path, entry) 
+                        set_mode_and_owner(dest_path, stat, entry) 
                 elif isinstance(entry, File):
                     if stat:
                         logging.info("%s already exists; removing it" % dest_path)
@@ -271,7 +272,7 @@ class TreeCopier(object):
                     logging.info("Copying %s to %s" % (src_path, dest_path))
                     if not self.dry_run:
                         shutil.copyfile(src_path, dest_path)
-                        set_mode_and_owner(dest_path, entry) 
+                        set_mode_and_owner(dest_path, stat, entry) 
 
     def __call__(self, dest, src, tree):
         self._copy(dest, src, tree.root)

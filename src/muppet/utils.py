@@ -25,3 +25,13 @@ def traverse_dict(dict, path, default=None):
     except KeyError:
         return default
     return retval 
+
+def getuidfor(name):
+    from pwd import getpwnam
+    pwent = getpwnam(name)
+    return pwent.pw_uid
+
+def getgidfor(name):
+    from grp import getgrnam
+    grent = getgrnam(name)
+    return grent.gr_gid
