@@ -61,7 +61,7 @@ class GitLowLevelWrapper(object):
         self.cwd = cwd
 
     def do_cmd(self, *args):
-       return do_cmd(self.command, *args, cwd=self.cwd)
+       return do_cmd(self.command, cwd=self.cwd, *args)
 
     def do_log_1(self, commit):
         i = line_by_line(sef.do_cmd('log', '-1', '--format=raw', commit))
