@@ -194,7 +194,7 @@ class Directory(Entry):
 
 def set_mode_and_owner(entry_path, stat, entry):
     if entry.mode is not None:
-        if getattr(os, 'lchmod'):
+        if hasattr(os, 'lchmod'):
             os.lchmod(entry_path, entry.mode)
         else:
             os.chmod(entry_path, entry.mode)
