@@ -194,7 +194,10 @@ class Directory(Entry):
 
 def set_mode_and_owner(entry_path, stat, entry):
     if entry.mode is not None:
-        os.lchmod(entry_path, entry.mode)
+        if getattr(os, 'lchmod'):
+            os.lchmod(entry_path, entry.mode)
+        else:
+            os.chmod(entry_path, entry.mode)
     if entry.owner is not None or entry.group is not None:
         owner = getuidfor(entry.owner) or stat.st_uid
         group = getgidfor(entry.group) or stat.st_gid
